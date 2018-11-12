@@ -1,0 +1,2 @@
+event_store_http_api:
+    resource: "routes/event_store_http_api.yaml"
