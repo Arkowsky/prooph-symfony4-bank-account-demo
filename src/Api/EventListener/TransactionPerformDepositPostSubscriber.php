@@ -5,8 +5,8 @@ namespace App\Api\EventListener;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Domain\BankAccountNumber;
 use App\Domain\Command\PerformDepositCommand;
-use App\Domain\Command\PerformDepositCommandHandler;
 use App\DTO\Transaction;
+use Prooph\ServiceBus\CommandBus;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,14 +15,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class TransactionPerformDepositPostSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PerformDepositCommandHandler
-     */
-    private $commandHandler;
 
-    public function __construct(PerformDepositCommandHandler $commandHandler)
+    /**
+     * @var CommandBus
+     */
+    private $commandBus;
+
+    public function __construct(CommandBus $commandBus)
     {
-        $this->commandHandler = $commandHandler;
+        $this->commandBus = $commandBus;
     }
 
     public static function getSubscribedEvents()
@@ -51,7 +52,7 @@ class TransactionPerformDepositPostSubscriber implements EventSubscriberInterfac
         $transactionId = Uuid::uuid4();
         $bankAccountNumber = BankAccountNumber::fromString($dtoTransaction->getBankAccountNumber());
 
-        $this->commandHandler->handle(
+        $this->commandBus->dispatch(
             new PerformDepositCommand(
                 [
                     'accountNumber' => $bankAccountNumber,

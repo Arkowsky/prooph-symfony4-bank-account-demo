@@ -6,7 +6,7 @@ namespace App\Domain\DomainEvent;
 
 use Prooph\EventSourcing\AggregateChanged;
 
-class BankAccountWasCreated extends AggregateChanged
+class BankAccountCreated extends AggregateChanged
 {
     public function ownerName(): string
     {

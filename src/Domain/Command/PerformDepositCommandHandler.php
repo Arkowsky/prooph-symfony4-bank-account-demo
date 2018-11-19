@@ -18,7 +18,7 @@ class PerformDepositCommandHandler
         $this->bankAccountRepository = $bankAccountRepository;
     }
 
-    public function handle(PerformDepositCommand $command)
+    public function __invoke(PerformDepositCommand $command)
     {
         $bankAccount = $this->bankAccountRepository->get($command->bankAccountNumber());
 

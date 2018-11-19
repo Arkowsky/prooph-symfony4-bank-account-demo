@@ -2,10 +2,9 @@
 
 namespace App\Domain\DomainEvent;
 
-use Money\Money;
 use Prooph\EventSourcing\AggregateChanged;
 
-class DepositWasPerformed extends AggregateChanged
+class DepositPerformed extends AggregateChanged
 {
     public function transactionId(): string
     {

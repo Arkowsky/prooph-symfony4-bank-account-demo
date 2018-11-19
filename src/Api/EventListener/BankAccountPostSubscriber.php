@@ -7,9 +7,9 @@ namespace App\Api\EventListener;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Domain\BankAccountNumber;
 use App\Domain\Command\CreateBankAccountCommand;
-use App\Domain\Command\CreateBankAccountCommandHandler;
 use App\DTO\BankAccount;
 use Money\Currency;
+use Prooph\ServiceBus\CommandBus;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -17,12 +17,14 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class BankAccountPostSubscriber implements EventSubscriberInterface
 {
-    /** @var CreateBankAccountCommandHandler */
-    private $createBankAccountCommandHandler;
+    /**
+     * @var CommandBus
+     */
+    private $commandBus;
 
-    public function __construct(CreateBankAccountCommandHandler $createBankAccountCommandHandler)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->createBankAccountCommandHandler = $createBankAccountCommandHandler;
+        $this->commandBus = $commandBus;
     }
 
     public static function getSubscribedEvents()
@@ -47,7 +49,7 @@ class BankAccountPostSubscriber implements EventSubscriberInterface
 
         $bankAccountNumber = BankAccountNumber::generateNew();
 
-        $this->createBankAccountCommandHandler->handle(
+        $this->commandBus->dispatch(
             new CreateBankAccountCommand(
                 [
                     'bankAccountNumber' => $bankAccountNumber,

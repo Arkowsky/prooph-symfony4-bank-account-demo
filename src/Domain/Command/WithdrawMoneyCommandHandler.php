@@ -18,7 +18,7 @@ class WithdrawMoneyCommandHandler
         $this->bankAccountRepository = $bankAccountRepository;
     }
 
-    public function handle(WithdrawMoneyCommand $command)
+    public function __invoke(WithdrawMoneyCommand $command)
     {
         $bankAccount = $this->bankAccountRepository->get($command->bankAccountNumber());
 

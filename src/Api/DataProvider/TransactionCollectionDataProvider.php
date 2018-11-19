@@ -6,28 +6,28 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use App\Domain\Query\GetBankAccountTransactionsQuery;
-use App\Domain\Query\GetBankAccountTransactionsQueryHandler;
 use App\DTO\Transaction;
+use Prooph\ServiceBus\QueryBus;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class TransactionCollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
     /**
-     * @var GetBankAccountTransactionsQueryHandler
-     */
-    private $commandHandler;
-    /**
      * @var RequestStack
      */
     private $requestStack;
+    /**
+     * @var QueryBus
+     */
+    private $queryBus;
 
     function __construct(
-        GetBankAccountTransactionsQueryHandler $commandHandler,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        QueryBus $queryBus
     )
     {
-        $this->commandHandler = $commandHandler;
         $this->requestStack = $requestStack;
+        $this->queryBus = $queryBus;
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
@@ -44,10 +44,16 @@ class TransactionCollectionDataProvider implements CollectionDataProviderInterfa
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
-        return $this->commandHandler->handle(new GetBankAccountTransactionsQuery(
+        $promise = $this->queryBus->dispatch(new GetBankAccountTransactionsQuery(
             [
                 'bankAccountNumber' => $this->requestStack->getCurrentRequest()->get('bankAccountNumber')
             ]
         ));
+
+        $promise->then(function ($result) use (&$receivedMessage): void {
+            $receivedMessage = $result;
+        });
+
+        return $receivedMessage;
     }
 }

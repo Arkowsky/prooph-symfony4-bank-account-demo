@@ -3,6 +3,7 @@
 namespace App\Domain\Query;
 
 use App\Projection\Transaction\TransactionFinder;
+use React\Promise\Deferred;
 
 class GetBankAccountTransactionsQueryHandler
 {
@@ -16,8 +17,13 @@ class GetBankAccountTransactionsQueryHandler
         $this->transactionFinder = $transactionFinder;
     }
 
-    public function handle(GetBankAccountTransactionsQuery $command)
+    public function __invoke(GetBankAccountTransactionsQuery $command, Deferred $deferred = null)
     {
-        return $this->transactionFinder->findAllForBankAccount($command->bankAccountNumber());
+        $transactions = $this->transactionFinder->findAllForBankAccount($command->bankAccountNumber());
+        if (null === $deferred) {
+            return $transactions;
+        }
+
+        $deferred->resolve($transactions);
     }
 }

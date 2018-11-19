@@ -4,3 +4,7 @@ prooph_service_bus:
       router:
         type: 'prooph_service_bus.command_bus_router'
 
+  query_buses:
+    default_query_bus:
+      router:
+        type: 'prooph_service_bus.query_bus_router'

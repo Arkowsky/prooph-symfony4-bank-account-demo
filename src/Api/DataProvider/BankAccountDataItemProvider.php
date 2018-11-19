@@ -8,19 +8,19 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use App\Domain\BankAccountNumber;
 use App\Domain\Query\GetBankAccountQuery;
-use App\Domain\Query\GetBankAccountQueryHandler;
 use App\DTO\BankAccount;
+use Prooph\ServiceBus\QueryBus;
 
 class BankAccountDataItemProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     /**
-     * @var GetBankAccountQueryHandler
+     * @var QueryBus
      */
-    private $bankAccountCommandHandler;
+    private $queryBus;
 
-    public function __construct(GetBankAccountQueryHandler $bankAccountCommandHandler)
+    function __construct(QueryBus $queryBus)
     {
-        $this->bankAccountCommandHandler = $bankAccountCommandHandler;
+        $this->queryBus = $queryBus;
     }
 
     /**
@@ -35,11 +35,18 @@ class BankAccountDataItemProvider implements ItemDataProviderInterface, Restrict
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        return $this->bankAccountCommandHandler->handle(
-            new GetBankAccountQuery(
-                BankAccountNumber::fromString($id)
+        $promise = $this->queryBus->dispatch(
+            new GetBankAccountQuery([
+                    'bankAccountNumber' => BankAccountNumber::fromString($id)
+                ]
             )
         );
+
+        $promise->then(function ($result) use (&$receivedMessage): void {
+            $receivedMessage = $result;
+        });
+
+        return $receivedMessage;
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool

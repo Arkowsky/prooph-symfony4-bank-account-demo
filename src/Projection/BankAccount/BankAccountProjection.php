@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Projection\BankAccount;
 
 use App\Domain\BankAccountNumber;
-use App\Domain\DomainEvent\BankAccountWasCreated;
-use App\Domain\DomainEvent\DepositWasPerformed;
+use App\Domain\DomainEvent\BankAccountCreated;
+use App\Domain\DomainEvent\DepositPerformed;
 use App\Domain\DomainEvent\MoneyWithdrawn;
 use Prooph\Bundle\EventStore\Projection\ReadModelProjection;
 use Prooph\EventStore\Projection\ReadModelProjector;
@@ -18,7 +18,7 @@ class BankAccountProjection implements ReadModelProjection
         $projector
             ->fromCategory('App\Domain\BankAccount')
             ->when([
-                BankAccountWasCreated::class => function ($state, BankAccountWasCreated $event) {
+                BankAccountCreated::class => function ($state, BankAccountCreated $event) {
                     /** @var BankAccountReadModel $readModel */
                     $readModel = $this->readModel();
 
@@ -45,7 +45,7 @@ class BankAccountProjection implements ReadModelProjection
                         ]
                     );
                 },
-                DepositWasPerformed::class => function ($state, DepositWasPerformed $event) {
+                DepositPerformed::class => function ($state, DepositPerformed $event) {
                     /** @var BankAccountReadModel $readModel */
                     $readModel = $this->readModel();
 

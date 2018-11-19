@@ -18,6 +18,7 @@
         "prooph/service-bus": "^6.2",
         "prooph/service-bus-symfony-bundle": "^0.7.0",
         "prooph/snapshotter": "^2.1",
+        "react/promise": "^2.7",
         "symfony/console": "^4.0",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.0",

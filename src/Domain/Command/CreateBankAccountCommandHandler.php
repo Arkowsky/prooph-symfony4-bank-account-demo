@@ -19,7 +19,7 @@ class CreateBankAccountCommandHandler
         $this->bankAccountRepository = $bankAccountRepository;
     }
 
-    public function handle(CreateBankAccountCommand $createBankAccountCommand): void
+    public function __invoke(CreateBankAccountCommand $createBankAccountCommand): void
     {
         $bankAccount = BankAccount::addNewWithData(
             $createBankAccountCommand->bankAccountNumber(),

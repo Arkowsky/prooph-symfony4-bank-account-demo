@@ -6,19 +6,19 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use App\Domain\Query\GetTransactionQuery;
-use App\Domain\Query\GetTransactionQueryHandler;
 use App\DTO\Transaction;
+use Prooph\ServiceBus\QueryBus;
 
 class TransactionDataItemProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
     /**
-     * @var GetTransactionQueryHandler
+     * @var QueryBus
      */
-    private $commandHandler;
+    private $queryBus;
 
-    function __construct(GetTransactionQueryHandler $commandHandler)
+    function __construct(QueryBus $queryBus)
     {
-        $this->commandHandler = $commandHandler;
+        $this->queryBus = $queryBus;
     }
 
     /**
@@ -32,11 +32,17 @@ class TransactionDataItemProvider implements ItemDataProviderInterface, Restrict
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        return $this->commandHandler->handle(new GetTransactionQuery(
+        $promise = $this->queryBus->dispatch(new GetTransactionQuery(
             [
                 'transactionId' => $id
             ]
         ));
+
+        $promise->then(function ($result) use (&$receivedMessage): void {
+            $receivedMessage = $result;
+        });
+
+        return $receivedMessage;
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool

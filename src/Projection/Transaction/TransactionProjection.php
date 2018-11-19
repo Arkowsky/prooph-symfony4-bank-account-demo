@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Projection\Transaction;
 
 use App\Domain\BankAccountNumber;
-use App\Domain\DomainEvent\DepositWasPerformed;
+use App\Domain\DomainEvent\DepositPerformed;
 use App\Domain\DomainEvent\MoneyWithdrawn;
 use Prooph\Bundle\EventStore\Projection\ReadModelProjection;
 use Prooph\EventStore\Projection\ReadModelProjector;
@@ -32,7 +32,7 @@ class TransactionProjection implements ReadModelProjection
                         'created_at' => $event->createdAt()->format("Y-m-d H:i:s"),
                     ]);
                 },
-                DepositWasPerformed::class => function ($state, DepositWasPerformed $event) {
+                DepositPerformed::class => function ($state, DepositPerformed $event) {
                     /** @var TransactionReadModel $readModel */
                     $readModel = $this->readModel();
 

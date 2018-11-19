@@ -203,6 +203,9 @@
     "ramsey/uuid": {
         "version": "3.7.3"
     },
+    "react/promise": {
+        "version": "v2.7.0"
+    },
     "roave/security-advisories": {
         "version": "dev-master"
     },

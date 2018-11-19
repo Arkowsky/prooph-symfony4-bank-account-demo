@@ -3,6 +3,7 @@
 namespace App\Domain\Query;
 
 use App\Projection\Transaction\TransactionFinder;
+use React\Promise\Deferred;
 
 class GetTransactionQueryHandler
 {
@@ -16,8 +17,13 @@ class GetTransactionQueryHandler
         $this->transactionFinder = $transactionFinder;
     }
 
-    public function handle(GetTransactionQuery $command)
+    public function __invoke(GetTransactionQuery $command, Deferred $deferred = null)
     {
-        return $this->transactionFinder->findByTransactionId($command->transactionId());
+        $transaction = $this->transactionFinder->findByTransactionId($command->transactionId());
+        if (null === $deferred) {
+            return $transaction;
+        }
+
+        $deferred->resolve($transaction);
     }
 }

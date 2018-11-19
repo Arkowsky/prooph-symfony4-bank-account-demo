@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain;
 
-use App\Domain\DomainEvent\BankAccountWasCreated;
-use App\Domain\DomainEvent\DepositWasPerformed;
+use App\Domain\DomainEvent\BankAccountCreated;
+use App\Domain\DomainEvent\DepositPerformed;
 use App\Domain\DomainEvent\MoneyWithdrawn;
 use Money\Currency;
 use Money\Money;
@@ -39,7 +39,7 @@ class BankAccount extends AggregateRoot
     {
         $bankAccount = new self();
         $bankAccount->recordThat(
-            BankAccountWasCreated::occur(
+            BankAccountCreated::occur(
                 $bankAccountNumber->toString(),
                 [
                     'ownerName' => $ownerName,
@@ -54,7 +54,7 @@ class BankAccount extends AggregateRoot
     public function performDeposit(Uuid $transactionId, Money $amount)
     {
         $this->recordThat(
-            DepositWasPerformed::occur(
+            DepositPerformed::occur(
                 $this->aggregateId(),
                 [
                     'amount' => $amount->absolute()->getAmount(),
@@ -92,13 +92,13 @@ class BankAccount extends AggregateRoot
     protected function apply(AggregateChanged $event): void
     {
         switch (get_class($event)) {
-            case BankAccountWasCreated::class:
+            case BankAccountCreated::class:
                 $this->number = BankAccountNumber::fromString($event->aggregateId());
                 $this->ownerName = $event->ownerName();
                 $this->lastUpdate = new \DateTime($event->createdAt()->format(DATE_ATOM));
                 break;
-            case DepositWasPerformed::class:
-                /** @var DepositWasPerformed $event */
+            case DepositPerformed::class:
+                /** @var DepositPerformed $event */
                 $this->currentBalance = $event->balanceAfterTransaction();
                 break;
             case MoneyWithdrawn::class:

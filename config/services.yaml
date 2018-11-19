@@ -20,3 +20,16 @@ services:
     App\:
         resource: '../src/*'
         exclude: '../src/{Entity,Migrations,Tests,Kernel.php}'
+
+    Prooph\ServiceBus\CommandBus: '@prooph_service_bus.default_command_bus'
+    Prooph\ServiceBus\QueryBus: '@prooph_service_bus.default_query_bus'
+
+    App\Domain\Command\:
+        resource: '../src/Domain/Command/*Handler.php'
+        tags:
+            - { name: 'prooph_service_bus.default_command_bus.route_target', message_detection: true }
+
+    App\Domain\Query\:
+        resource: '../src/Domain/Query/*Handler.php'
+        tags:
+            - { name: 'prooph_service_bus.default_query_bus.route_target', message_detection: true }

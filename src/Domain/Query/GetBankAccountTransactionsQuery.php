@@ -2,11 +2,11 @@
 
 namespace App\Domain\Query;
 
-use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadConstructable;
 use Prooph\Common\Messaging\PayloadTrait;
+use Prooph\Common\Messaging\Query;
 
-class GetBankAccountTransactionsQuery extends Command implements PayloadConstructable
+class GetBankAccountTransactionsQuery extends Query implements PayloadConstructable
 {
     use PayloadTrait;
 

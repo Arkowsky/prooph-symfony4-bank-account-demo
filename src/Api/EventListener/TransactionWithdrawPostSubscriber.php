@@ -5,8 +5,8 @@ namespace App\Api\EventListener;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Domain\BankAccountNumber;
 use App\Domain\Command\WithdrawMoneyCommand;
-use App\Domain\Command\WithdrawMoneyCommandHandler;
 use App\DTO\Transaction;
+use Prooph\ServiceBus\CommandBus;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +16,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class TransactionWithdrawPostSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var WithdrawMoneyCommandHandler
+     * @var CommandBus
      */
-    private $commandHandler;
+    private $commandBus;
 
-    public function __construct(WithdrawMoneyCommandHandler $commandHandler)
+    public function __construct(CommandBus $commandBus)
     {
-        $this->commandHandler = $commandHandler;
+        $this->commandBus = $commandBus;
     }
 
     public static function getSubscribedEvents()
@@ -51,7 +51,7 @@ class TransactionWithdrawPostSubscriber implements EventSubscriberInterface
         $transactionId = Uuid::uuid4();
         $bankAccountNumber = BankAccountNumber::fromString($dtoTransaction->getBankAccountNumber());
 
-        $this->commandHandler->handle(
+        $this->commandBus->dispatch(
             new WithdrawMoneyCommand(
                 [
                     'accountNumber' => $bankAccountNumber,

@@ -5,21 +5,16 @@ declare(strict_types=1);
 namespace App\Domain\Query;
 
 use App\Domain\BankAccountNumber;
+use Prooph\Common\Messaging\PayloadConstructable;
+use Prooph\Common\Messaging\PayloadTrait;
+use Prooph\Common\Messaging\Query;
 
-class GetBankAccountQuery
+class GetBankAccountQuery extends Query implements PayloadConstructable
 {
-    /**
-     * @var BankAccountNumber
-     */
-    private $bankAccountNumber;
-
-    public function __construct(BankAccountNumber $bankAccountNumber)
-    {
-        $this->bankAccountNumber = $bankAccountNumber;
-    }
+    use PayloadTrait;
 
     public function bankAccountNumber(): BankAccountNumber
     {
-        return $this->bankAccountNumber;
+        return $this->payload()['bankAccountNumber'];
     }
 }
